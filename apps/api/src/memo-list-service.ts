@@ -4,7 +4,6 @@ import {
   docToText,
   markdownToDoc,
   getDiagramSummary,
-  getInfographicSummary,
   getTableSummary,
   type MemoSummary,
 } from "@edgeever/shared";
@@ -72,7 +71,6 @@ export const mapMemoSummary = (row: MemoSummaryRow): MemoSummary => ({
     createExcerpt(row.content_text ?? "") ||
     createExcerpt(docToText(markdownToDoc(row.content_markdown ?? ""))),
   ...getDiagramSummary(row.content_markdown),
-  ...getInfographicSummary(row.content_markdown),
   ...getTableSummary(row.content_markdown),
   tags: parseJsonArray(row.tags_json),
   isPinned: Boolean(row.is_pinned),

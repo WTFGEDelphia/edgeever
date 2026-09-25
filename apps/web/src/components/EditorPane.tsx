@@ -34,8 +34,7 @@ import { Button } from "@/components/ui/button";
 import { ClipboardCopyNotice } from "@/components/ClipboardCopyNotice";
 import { MemoEditorHeaderActions } from "@/components/MemoEditorHeaderActions";
 import { MemoEditorMetadataRow } from "@/components/MemoEditorMetadataRow";
-import { MemoEditorFocusModeButton, MemoEditorTopRowLeading, MemoEditorUpdatedLabel } from "@/components/MemoEditorTopRowLeading";
-import { MemoEditorToolbarDivider } from "@/components/MemoEditorToolbarChrome";
+import { MemoEditorTopRowLeading } from "@/components/MemoEditorTopRowLeading";
 import {
   MEMO_EDITOR_TITLE_REGION_CLASS_NAME,
   MEMO_EDITOR_TOP_ROW_CLASS_NAME,
@@ -3536,6 +3535,9 @@ const RichEditorPane = ({
       <header className="shrink-0 border-b border-slate-200 bg-card">
         <div className={MEMO_EDITOR_TOP_ROW_CLASS_NAME}>
           <MemoEditorTopRowLeading
+            desktopFocusMode={desktopFocusMode}
+            updatedLabel={updatedLabel}
+            onToggleDesktopFocusMode={onToggleDesktopFocusMode}
             mobileBackButton={(
               <Button
                 className="lg:hidden"
@@ -3549,23 +3551,37 @@ const RichEditorPane = ({
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             )}
-            titleInput={(
-              <MemoTitleInput
-                value={title}
-                readOnly={effectiveReadOnly}
-                onValueChange={(nextTitle) => {
-                  setTitle(nextTitle);
-                  persistCurrentDraft(nextTitle, tagsText, getMobilePlainTextValue());
-                  markDirty();
-                }}
-                placeholder={t("common.untitledMemo")}
-              />
-            )}
           />
 
           <div className="flex shrink-0 items-center gap-1">
-            <div className="flex min-w-0 items-center gap-1.5">
-              <MemoEditorUpdatedLabel updatedLabel={updatedLabel} />
+            {isMemoShared && !readOnly && (
+              <Button
+                className="h-8 gap-1.5 rounded-full bg-emerald-50 px-2 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 hover:text-emerald-800 focus-visible:ring-emerald-500"
+                size="sm"
+                variant="ghost"
+                type="button"
+                title={t("sharing.manage")}
+                aria-label={t("sharing.manage")}
+                onClick={() => setShareOpen(true)}
+              >
+                <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+                <span className="hidden sm:inline">{t("sharing.active")}</span>
+              </Button>
+            )}
+            {!readOnly && !isMemoShared && !mobileEditingActive && (
+              <Button
+                className="h-8 w-8 text-slate-500 sm:hidden"
+                size="icon"
+                variant="ghost"
+                type="button"
+                title={t(isLocalMemoId(memo.id) ? "sharing.afterSync" : "sharing.action")}
+                aria-label={t(isLocalMemoId(memo.id) ? "sharing.afterSync" : "sharing.action")}
+                disabled={isLocalMemoId(memo.id)}
+                onClick={() => setShareOpen(true)}
+              >
+                <Share2 className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            )}
             <span
               className="hidden whitespace-nowrap px-1.5 text-xs tabular-nums text-slate-400 sm:inline-flex"
               title={t("editor.characterCount", { count: characterCount })}
@@ -3590,7 +3606,7 @@ const RichEditorPane = ({
             )}
             <m.span
               key={`${saveState}-${String(hasUnsavedChanges)}`}
-              className={cn("hidden items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium sm:inline-flex", saveStateClassName)}
+              className={cn("hidden items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium sm:inline-flex", saveStateClassName)}
               role="status"
               aria-live="polite"
               title={saveConflictReason ?? undefined}
@@ -3610,7 +3626,7 @@ const RichEditorPane = ({
             </m.span>
             <m.span
               key={`${imageUploadState}-${saveState}-${String(hasUnsavedChanges)}`}
-              className={cn("inline-flex max-w-[5.5rem] truncate rounded-full px-2 py-1 text-xs font-medium sm:hidden", mobileStatusClassName)}
+              className={cn("inline-flex max-w-[5.5rem] truncate rounded-full px-2 py-1 text-[11px] font-medium sm:hidden", mobileStatusClassName)}
               role="status"
               aria-live="polite"
               title={saveConflictReason ?? undefined}
@@ -3619,40 +3635,6 @@ const RichEditorPane = ({
             >
               {mobileStatusLabel}
             </m.span>
-            </div>
-            <MemoEditorToolbarDivider className="mx-0.5 hidden h-4 sm:block" />
-            <div className="flex items-center gap-0.5">
-            <MemoEditorFocusModeButton
-              desktopFocusMode={desktopFocusMode}
-              onToggleDesktopFocusMode={onToggleDesktopFocusMode}
-            />
-            {isMemoShared && !readOnly && (
-              <Button
-                className="h-8 w-8 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 hover:text-emerald-800 focus-visible:ring-emerald-500"
-                size="icon"
-                variant="ghost"
-                type="button"
-                title={t("sharing.manage")}
-                aria-label={t("sharing.manage")}
-                onClick={() => setShareOpen(true)}
-              >
-                <Share2 className="h-4 w-4" aria-hidden="true" />
-              </Button>
-            )}
-            {!readOnly && !isMemoShared && !mobileEditingActive && (
-              <Button
-                className="h-8 w-8 text-slate-500 sm:hidden"
-                size="icon"
-                variant="ghost"
-                type="button"
-                title={t(isLocalMemoId(memo.id) ? "sharing.afterSync" : "sharing.action")}
-                aria-label={t(isLocalMemoId(memo.id) ? "sharing.afterSync" : "sharing.action")}
-                disabled={isLocalMemoId(memo.id)}
-                onClick={() => setShareOpen(true)}
-              >
-                <Share2 className="h-4 w-4" aria-hidden="true" />
-              </Button>
-            )}
             {mobileEditingActive && !readOnly && (
               <button
                 className="inline-flex h-8 items-center justify-center rounded-full bg-slate-950 px-3 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-500 sm:hidden"
@@ -3712,7 +3694,7 @@ const RichEditorPane = ({
                   {!effectiveReadOnly && (
                     <IconTooltip label={`${t("aiAssistant.open")} (${formatShortcutBinding(shortcutSettings.openAiAssistant)})`}>
                       <Button className="hidden h-8 w-8 text-emerald-600 transition-colors hover:bg-emerald-50 hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-300 sm:inline-flex" size="icon" variant="ghost" aria-label={t("aiAssistant.open")} onClick={openAiAssistant}>
-                        <Sparkles className="h-4 w-4" strokeWidth={1.75} />
+                        <Sparkles className="h-5 w-5" strokeWidth={2.25} />
                       </Button>
                     </IconTooltip>
                   )}
@@ -3759,11 +3741,11 @@ const RichEditorPane = ({
                           {wechatCopyState === "copying" ? (
                             <LoaderCircle className="h-4 w-4 animate-spin" />
                           ) : wechatCopyState === "copied" ? (
-                            <Check className="h-4 w-4" strokeWidth={2.25} />
+                            <Check className="h-5 w-5" strokeWidth={2.75} />
                           ) : wechatCopyState === "error" ? (
-                            <CircleAlert className="h-4 w-4" strokeWidth={1.75} />
+                            <CircleAlert className="h-5 w-5" strokeWidth={2.25} />
                           ) : (
-                            <WeChatIcon className="h-4 w-4" />
+                            <WeChatIcon className="h-5 w-5" />
                           )}
                         </Button>
                       </TooltipTrigger>
@@ -3893,11 +3875,22 @@ const RichEditorPane = ({
                 </>
               )}
             />
-            </div>
           </div>
         </div>
 
         <div className={MEMO_EDITOR_TITLE_REGION_CLASS_NAME}>
+          <div className="min-w-0">
+            <MemoTitleInput
+              value={title}
+              readOnly={effectiveReadOnly}
+              onValueChange={(nextTitle) => {
+                setTitle(nextTitle);
+                persistCurrentDraft(nextTitle, tagsText, getMobilePlainTextValue());
+                markDirty();
+              }}
+              placeholder={t("common.untitledMemo")}
+            />
+          </div>
           <MemoEditorMetadataRow
             contentMarkdown={currentMarkdownForAi}
             disabled={effectiveReadOnly}
@@ -3921,7 +3914,7 @@ const RichEditorPane = ({
                   <IconTooltip label={`${t(desktopReadingProtection ? "editor.disableReadingProtection" : "editor.enableReadingProtection")} (${formatShortcutBinding(shortcutSettings.toggleReadingProtection)})`}>
                     <Button
                       className={cn(
-                        "hidden h-7 w-7 shrink-0 sm:inline-flex",
+                        "hidden shrink-0 sm:inline-flex",
                         desktopReadingProtection && "bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-200 hover:text-slate-900"
                       )}
                       size="icon"
@@ -3930,7 +3923,7 @@ const RichEditorPane = ({
                       aria-pressed={desktopReadingProtection}
                       onClick={toggleDesktopReadingProtection}
                     >
-                      {desktopReadingProtection ? <Lock className="h-3.5 w-3.5" /> : <LockOpen className="h-3.5 w-3.5" />}
+                      {desktopReadingProtection ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
                     </Button>
                   </IconTooltip>
                 )}
@@ -4047,7 +4040,7 @@ const RichEditorPane = ({
             "flex gap-8 transition-all duration-200",
             useMarkdownSourceEditor
               ? "h-full min-h-0 flex-1 items-stretch px-0 py-0"
-              : "min-h-full items-start px-4 py-2 sm:px-7 lg:px-24",
+              : "min-h-full items-start px-4 py-2 sm:px-7 lg:px-10",
             desktopFocusMode
               ? "mx-auto w-full max-w-[1400px] justify-center"
               : editorContentAlignment === "center"

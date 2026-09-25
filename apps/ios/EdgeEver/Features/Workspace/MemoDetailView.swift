@@ -899,16 +899,12 @@ struct MemoDetailView: View {
             }
             .buttonStyle(.plain)
             .disabled(memo.isDeleted || blocksRichTextEdit(memo))
-            .accessibilityLabel(isInfographic(memo)
-                ? env.preferences.t("信息图标题", en: "Infographic title")
-                : isStructuredTable(memo)
+            .accessibilityLabel(isStructuredTable(memo)
                 ? env.preferences.t("表格标题", en: "Database title")
                 : isVisualDiagram(memo)
                 ? env.preferences.t("图表标题", en: "Diagram title")
                 : env.preferences.t("编辑笔记标题", en: "Edit note title"))
-            .accessibilityHint(isInfographic(memo)
-                ? env.preferences.t("信息图请在 Web 或桌面端编辑", en: "Edit infographics on Web or desktop")
-                : isStructuredTable(memo)
+            .accessibilityHint(isStructuredTable(memo)
                 ? env.preferences.t("多维表格请在 Web 或桌面端编辑", en: "Edit databases on Web or desktop")
                 : isVisualDiagram(memo)
                 ? env.preferences.t("可视化图表请在 Web 或桌面端编辑", en: "Edit visual diagrams on Web or desktop")
@@ -937,12 +933,8 @@ struct MemoDetailView: View {
         memo.contentMarkdown.contains("<!-- edgeever-table-v1:")
     }
 
-    private func isInfographic(_ memo: MemoDetail) -> Bool {
-        memo.contentMarkdown.contains("<!-- edgeever-infographic-v1:")
-    }
-
     private func blocksRichTextEdit(_ memo: MemoDetail) -> Bool {
-        isVisualDiagram(memo) || isStructuredTable(memo) || isInfographic(memo)
+        isVisualDiagram(memo) || isStructuredTable(memo)
     }
 
     private func refreshSyncStatus() {
