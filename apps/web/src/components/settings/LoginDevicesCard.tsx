@@ -3,9 +3,8 @@ import { Check, Laptop, MonitorSmartphone, Pencil, Smartphone, Tablet, X } from 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  SETTINGS_CARD_DESCRIPTION_CLASSNAME,
   SETTINGS_CARD_HEADER_CLASSNAME,
   SETTINGS_CARD_ICON_CLASSNAME,
   SETTINGS_CARD_TITLE_CLASSNAME,
@@ -124,7 +123,6 @@ export const LoginDevicesCard = ({ authRequired, isLoggingOut, onLogout }: Login
               <MonitorSmartphone className={SETTINGS_CARD_ICON_CLASSNAME} />
               {t("loginDevices.title")}
             </CardTitle>
-            <CardDescription className={SETTINGS_CARD_DESCRIPTION_CLASSNAME}>{t("loginDevices.description")}</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="p-4 pt-0">
